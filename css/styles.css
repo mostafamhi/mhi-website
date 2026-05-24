@@ -1106,6 +1106,14 @@ button { cursor: pointer; border: none; background: none; }
   text-transform: uppercase;
   color: rgba(200,76,71,.9);
   margin-bottom: 4px;
+  cursor: pointer;
+  border-bottom: 1px dashed rgba(200,76,71,.4);
+  transition: color .2s, border-color .2s;
+}
+
+.project-type:hover {
+  color: var(--white);
+  border-color: rgba(255,255,255,.5);
 }
 
 .project-card h4 {

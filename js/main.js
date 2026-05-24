@@ -161,30 +161,40 @@ setTimeout(() => {
 }, 1500);
 
 /* -------------------------------------------------------
-   Project filter tabs
+   Project filter tabs + clickable category tags
 ------------------------------------------------------- */
-const filterBtns  = document.querySelectorAll('.filter-btn');
+const filterBtns   = document.querySelectorAll('.filter-btn');
 const projectCards = document.querySelectorAll('.project-card');
 
+function applyFilter(filter) {
+  // Update active filter button
+  filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+
+  // Show / hide cards
+  projectCards.forEach(card => {
+    const match = filter === 'all' || card.dataset.category === filter;
+    if (match) {
+      card.classList.remove('hidden');
+      card.style.animation = 'fadeInUp .4s ease both';
+    } else {
+      card.classList.add('hidden');
+      card.style.animation = '';
+    }
+  });
+}
+
+// Filter buttons
 filterBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const filter = btn.dataset.filter;
+  btn.addEventListener('click', () => applyFilter(btn.dataset.filter));
+});
 
-    // Update active button
-    filterBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    // Show / hide cards with fade
-    projectCards.forEach(card => {
-      const match = filter === 'all' || card.dataset.category === filter;
-      if (match) {
-        card.classList.remove('hidden');
-        card.style.animation = 'fadeInUp .4s ease both';
-      } else {
-        card.classList.add('hidden');
-        card.style.animation = '';
-      }
-    });
+// Clickable category tags on each card
+document.querySelectorAll('.project-type').forEach(tag => {
+  tag.addEventListener('click', () => {
+    const category = tag.closest('.project-card').dataset.category;
+    applyFilter(category);
+    // Scroll to filter bar
+    document.querySelector('.project-filters').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 });
 
