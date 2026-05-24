@@ -12,6 +12,8 @@ const backToTop   = document.getElementById('backToTop');
 const contactForm = document.getElementById('contactForm');
 const formSuccess = document.getElementById('formSuccess');
 const yearEl      = document.getElementById('currentYear');
+const sections   = document.querySelectorAll('section[id]');
+const navAnchors = document.querySelectorAll('.nav-link:not(.nav-cta)');
 
 /* -------------------------------------------------------
    Current year
@@ -40,8 +42,6 @@ onScroll(); // run once on load
 /* -------------------------------------------------------
    Active nav link on scroll
 ------------------------------------------------------- */
-const sections  = document.querySelectorAll('section[id]');
-const navAnchors = document.querySelectorAll('.nav-link:not(.nav-cta)');
 
 function updateActiveNav() {
   let current = '';
