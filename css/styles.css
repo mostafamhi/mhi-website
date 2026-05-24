@@ -188,7 +188,7 @@ button { cursor: pointer; border: none; background: none; }
 }
 
 .logo-img {
-  height: 54px;
+  height: 108px;
   width: auto;
   object-fit: contain;
   background: var(--white);
@@ -1496,7 +1496,7 @@ a.contact-item-value:hover { color: var(--red); }
 }
 
 .footer-logo-img {
-  height: 64px;
+  height: 128px;
   width: auto;
   object-fit: contain;
   margin-bottom: 20px;
