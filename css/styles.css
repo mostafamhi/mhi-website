@@ -928,6 +928,107 @@ button { cursor: pointer; border: none; background: none; }
 
 .cert-badge i { color: var(--red); font-size: 1rem; }
 
+.cert-logo {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cert-logo img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Zeta product showcase */
+.zeta-products { margin: 48px 0; }
+
+.zeta-products-label {
+  text-align: center;
+  font-size: .8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--gray-600);
+  margin-bottom: 24px;
+}
+
+.zeta-products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.zeta-product-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 28px 20px 18px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.zeta-product-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+}
+.zeta-product-card img {
+  height: 110px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+.zeta-product-card span {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--blue);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Fire Alarm product spotlight */
+.fas-product-highlight {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius-lg);
+  padding: 32px 40px;
+  margin-bottom: 48px;
+}
+.fas-product-img {
+  flex-shrink: 0;
+  width: 150px;
+  height: 150px;
+  background: var(--white);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.fas-product-img img { width: 100%; height: 100%; object-fit: contain; }
+.fas-product-text h3 {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+.fas-product-text p { color: rgba(255,255,255,.75); font-size: .92rem; line-height: 1.7; }
+
+@media (max-width: 768px) {
+  .zeta-products-grid { grid-template-columns: repeat(2, 1fr); }
+  .fas-product-highlight { flex-direction: column; text-align: center; padding: 28px 24px; }
+  .fas-product-img { width: 120px; height: 120px; }
+}
+
 /* ============================================================
    SERVICES
 ============================================================ */
