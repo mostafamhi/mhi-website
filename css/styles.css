@@ -1545,21 +1545,22 @@ a.contact-item-value:hover { color: var(--red); }
 /* ============================================================
    SCROLL REVEAL ANIMATIONS
 ============================================================ */
+/* Elements are ALWAYS visible by default (no JS required) */
 .reveal-up,
 .reveal-left,
 .reveal-right {
-  opacity: 0;
   transition: opacity .7s ease, transform .7s ease;
   transition-delay: var(--delay, 0s);
 }
 
-.reveal-up    { transform: translateY(40px); }
-.reveal-left  { transform: translateX(-40px); }
-.reveal-right { transform: translateX(40px); }
+/* Only hide elements when JS has loaded and confirmed working */
+.js-ready .reveal-up    { opacity: 0; transform: translateY(40px); }
+.js-ready .reveal-left  { opacity: 0; transform: translateX(-40px); }
+.js-ready .reveal-right { opacity: 0; transform: translateX(40px); }
 
-.reveal-up.revealed,
-.reveal-left.revealed,
-.reveal-right.revealed {
+.js-ready .reveal-up.revealed,
+.js-ready .reveal-left.revealed,
+.js-ready .reveal-right.revealed {
   opacity: 1;
   transform: translate(0);
 }

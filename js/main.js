@@ -135,8 +135,13 @@ const statsBar = document.querySelector('.stats-bar');
 if (statsBar) counterObserver.observe(statsBar);
 
 /* -------------------------------------------------------
-   Scroll reveal — IntersectionObserver (reliable in all contexts)
+   Scroll reveal — progressive enhancement
+   Content is visible by default; JS adds animations on top.
 ------------------------------------------------------- */
+
+// Mark body so CSS can safely hide elements for animation
+document.body.classList.add('js-ready');
+
 const revealObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -144,10 +149,16 @@ const revealObserver = new IntersectionObserver(entries => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+}, { threshold: 0, rootMargin: '0px 0px 0px 0px' });
 
 document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right')
   .forEach(el => revealObserver.observe(el));
+
+// Hard fallback: reveal everything after 1.5s no matter what
+setTimeout(() => {
+  document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right')
+    .forEach(el => el.classList.add('revealed'));
+}, 1500);
 
 /* -------------------------------------------------------
    Project filter tabs
