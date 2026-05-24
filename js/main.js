@@ -199,39 +199,50 @@ document.querySelectorAll('.project-type').forEach(tag => {
 });
 
 /* -------------------------------------------------------
-   Contact form (client-side demo)
+   Contact form — Web3Forms submission
 ------------------------------------------------------- */
 if (contactForm) {
-  contactForm.addEventListener('submit', e => {
+  contactForm.addEventListener('submit', async e => {
     e.preventDefault();
 
     const name    = contactForm.querySelector('#name');
     const email   = contactForm.querySelector('#email');
     const message = contactForm.querySelector('#message');
 
-    // Simple validation
+    // Validate required fields
     let valid = true;
     [name, email, message].forEach(field => {
       if (!field.value.trim()) {
         field.style.borderColor = '#e53e3e';
-        field.addEventListener('input', () => {
-          field.style.borderColor = '';
-        }, { once: true });
+        field.addEventListener('input', () => { field.style.borderColor = ''; }, { once: true });
         valid = false;
       }
     });
-
     if (!valid) return;
 
-    // Simulate send (replace with real form handler / API call)
     const submitBtn = contactForm.querySelector('.btn-submit');
+    const originalLabel = submitBtn.innerHTML;
     submitBtn.disabled  = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
 
-    setTimeout(() => {
-      submitBtn.style.display = 'none';
-      formSuccess.style.display = 'flex';
-      contactForm.reset();
-    }, 1200);
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: new FormData(contactForm),
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (res.ok) {
+        submitBtn.style.display = 'none';
+        formSuccess.style.display = 'flex';
+        contactForm.reset();
+      } else {
+        throw new Error('Server error');
+      }
+    } catch {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalLabel;
+      alert('Sorry, something went wrong. Please email us directly at mostafa@mhisystem.com');
+    }
   });
 }
