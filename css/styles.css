@@ -184,16 +184,14 @@ button { cursor: pointer; border: none; background: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 76px;
+  height: 120px;
 }
 
 .logo-img {
   height: 108px;
   width: auto;
   object-fit: contain;
-  background: var(--white);
-  border-radius: 8px;
-  padding: 5px 10px;
+  display: block;
   transition: var(--transition);
 }
 

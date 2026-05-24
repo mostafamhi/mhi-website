@@ -94,7 +94,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     const target = document.querySelector(anchor.getAttribute('href'));
     if (!target) return;
     e.preventDefault();
-    const offset = 76; // header height
+    const offset = 120; // header height
     const top    = target.getBoundingClientRect().top + window.scrollY - offset;
     window.scrollTo({ top, behavior: 'smooth' });
   });
