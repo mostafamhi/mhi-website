@@ -1,0 +1,70 @@
+/* ============================================================
+   RTL Overrides — Arabic Version
+   Applied on top of styles.css for dir="rtl" pages
+============================================================ */
+
+/* Arabic font */
+:root {
+  --font-body: 'Cairo', sans-serif;
+  --font-head: 'Cairo', sans-serif;
+}
+
+/* Back-to-top: flip to left side */
+.back-to-top {
+  right: auto;
+  left: 32px;
+}
+
+/* Mobile nav: slide in from left instead of right */
+.nav-links {
+  right: auto;
+  left: -100%;
+}
+.nav-links.open {
+  left: 0;
+  right: auto;
+}
+
+/* Footer underline accent: right-aligned */
+.footer-col-title::after {
+  left: auto;
+  right: 0;
+}
+
+/* Footer links hover: indent right */
+.footer-links a:hover {
+  padding-left: 0;
+  padding-right: 4px;
+}
+
+/* Section divider: keep centered except where overridden */
+.zeta-headline .section-divider {
+  margin: 0 0 20px auto;
+}
+.zeta-headline .section-tag  { display: block; text-align: right; }
+.zeta-headline .section-title { text-align: right; }
+
+/* About visual card: flip layout on desktop */
+@media (min-width: 769px) {
+  .about-grid {
+    direction: rtl;
+  }
+}
+
+/* Swap horizontal reveal directions for RTL */
+body.js-ready .reveal-left  { transform: translateX(40px);  }
+body.js-ready .reveal-right { transform: translateX(-40px); }
+
+/* Contact items: icon spacing */
+.contact-item { direction: rtl; }
+
+/* Footer bottom: reverse order */
+.footer-bottom-inner {
+  flex-direction: row-reverse;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .back-to-top { left: 20px; right: auto; }
+  .footer-bottom-inner { flex-direction: column; text-align: center; }
+}

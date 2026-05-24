@@ -252,6 +252,29 @@ button { cursor: pointer; border: none; background: none; }
   box-shadow: 0 4px 16px rgba(200,76,71,.4);
 }
 
+.nav-link.lang-switch {
+  border: 1.5px solid rgba(255,255,255,.5);
+  padding: 7px 14px;
+  border-radius: 50px;
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .03em;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+.nav-link.lang-switch::after { display: none; }
+.nav-link.lang-switch:hover {
+  background: rgba(255,255,255,.15);
+  border-color: rgba(255,255,255,.9);
+}
+.header.scrolled .nav-link.lang-switch {
+  border-color: var(--blue);
+  color: var(--blue) !important;
+}
+.header.scrolled .nav-link.lang-switch:hover {
+  background: var(--blue);
+  color: var(--white) !important;
+}
+
 /* Hamburger */
 .hamburger {
   display: none;
@@ -1629,6 +1652,13 @@ a.contact-item-value:hover { color: var(--red); }
     margin-top: 16px;
     text-align: center;
     justify-content: center;
+  }
+
+  .nav-link.lang-switch {
+    margin-top: 8px;
+    border-color: rgba(255,255,255,.4);
+    display: inline-block;
+    width: auto;
   }
 
   /* Hero */
