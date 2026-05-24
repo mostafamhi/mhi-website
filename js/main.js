@@ -32,12 +32,6 @@ function onScroll() {
 
   // Active nav link based on section visibility
   updateActiveNav();
-
-  // Scroll reveal
-  revealElements();
-
-  // Counter trigger
-  triggerCounters();
 }
 
 window.addEventListener('scroll', onScroll, { passive: true });
@@ -116,56 +110,44 @@ backToTop.addEventListener('click', () => {
 /* -------------------------------------------------------
    Animated counters
 ------------------------------------------------------- */
-let countersTriggered = false;
-
-function triggerCounters() {
-  const statsBar = document.querySelector('.stats-bar');
-  if (!statsBar || countersTriggered) return;
-
-  const rect = statsBar.getBoundingClientRect();
-  if (rect.top < window.innerHeight - 60) {
-    countersTriggered = true;
-    document.querySelectorAll('.stat-number[data-target]').forEach(el => {
-      animateCounter(el, +el.dataset.target, 1800);
-    });
-  }
-}
-
 function animateCounter(el, target, duration) {
-  const start    = performance.now();
-  const initial  = 0;
-
+  const start = performance.now();
   function step(now) {
-    const elapsed  = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased    = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-    el.textContent = Math.round(initial + eased * (target - initial));
+    const progress = Math.min((now - start) / duration, 1);
+    const eased    = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(eased * target);
     if (progress < 1) requestAnimationFrame(step);
   }
-
   requestAnimationFrame(step);
 }
 
-/* -------------------------------------------------------
-   Scroll reveal
-------------------------------------------------------- */
-const revealTargets = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right');
+const counterObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    document.querySelectorAll('.stat-number[data-target]').forEach(el => {
+      animateCounter(el, +el.dataset.target, 1800);
+    });
+    counterObserver.disconnect();
+  });
+}, { threshold: 0.3 });
 
-function revealElements() {
-  revealTargets.forEach(el => {
-    if (el.classList.contains('revealed')) return;
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight - 80) {
-      el.classList.add('revealed');
+const statsBar = document.querySelector('.stats-bar');
+if (statsBar) counterObserver.observe(statsBar);
+
+/* -------------------------------------------------------
+   Scroll reveal — IntersectionObserver (reliable in all contexts)
+------------------------------------------------------- */
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('revealed');
+      revealObserver.unobserve(entry.target);
     }
   });
-}
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-// Trigger once on load (for above-fold elements)
-window.addEventListener('load', () => {
-  revealElements();
-  triggerCounters();
-});
+document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right')
+  .forEach(el => revealObserver.observe(el));
 
 /* -------------------------------------------------------
    Project filter tabs
