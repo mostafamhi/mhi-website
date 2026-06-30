@@ -1033,6 +1033,101 @@ button { cursor: pointer; border: none; background: none; }
 /* ============================================================
    SERVICES
 ============================================================ */
+/* ============================================================
+   PRODUCTS CATALOG
+============================================================ */
+.products-catalog { background: var(--gray-50); }
+
+.prod-cat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.prod-cat-btn {
+  padding: 10px 24px;
+  border-radius: 50px;
+  border: 2px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-600);
+  font-family: var(--font-body);
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.prod-cat-btn:hover { border-color: var(--blue); color: var(--blue); }
+.prod-cat-btn.active { background: var(--blue); border-color: var(--blue); color: var(--white); }
+
+.prod-panel { display: none; }
+.prod-panel.active { display: block; animation: fadeInUp .35s ease both; }
+
+.prod-panel-desc {
+  text-align: center;
+  color: var(--gray-600);
+  font-size: .95rem;
+  line-height: 1.7;
+  max-width: 700px;
+  margin: 0 auto 36px;
+}
+
+.prod-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.prod-grid-center { max-width: 340px; margin: 0 auto; }
+
+.prod-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.prod-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
+
+.prod-card-img {
+  background: var(--gray-100);
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.prod-card-img img {
+  max-height: 140px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.prod-card h4 {
+  font-family: var(--font-head);
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--blue);
+  padding: 16px 20px 8px;
+  line-height: 1.3;
+}
+
+.prod-card p {
+  font-size: .85rem;
+  color: var(--gray-600);
+  padding: 0 20px 20px;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .prod-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .prod-grid { grid-template-columns: 1fr; }
+  .prod-cat-btn { font-size: .8rem; padding: 8px 16px; }
+}
+
 .services { background: var(--white); }
 
 .services-grid {

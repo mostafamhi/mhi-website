@@ -199,6 +199,21 @@ document.querySelectorAll('.project-type').forEach(tag => {
 });
 
 /* -------------------------------------------------------
+   Product catalog tabs
+------------------------------------------------------- */
+const prodCatBtns = document.querySelectorAll('.prod-cat-btn');
+const prodPanels  = document.querySelectorAll('.prod-panel');
+
+prodCatBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    prodCatBtns.forEach(b => b.classList.remove('active'));
+    prodPanels.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelector(`.prod-panel[data-tab="${btn.dataset.tab}"]`).classList.add('active');
+  });
+});
+
+/* -------------------------------------------------------
    Contact form — Web3Forms submission
 ------------------------------------------------------- */
 if (contactForm) {
