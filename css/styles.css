@@ -175,7 +175,8 @@ button { cursor: pointer; border: none; background: none; }
   padding: 0;
 }
 
-.header.scrolled {
+.header.scrolled,
+.page-static .header {
   background: var(--white);
   box-shadow: 0 2px 24px rgba(0,0,0,.1);
 }
@@ -233,9 +234,12 @@ button { cursor: pointer; border: none; background: none; }
 .nav-link:hover,
 .nav-link.active { color: var(--white); }
 
-.header.scrolled .nav-link { color: var(--gray-800); }
+.header.scrolled .nav-link,
+.page-static .header .nav-link { color: var(--gray-800); }
 .header.scrolled .nav-link:hover,
-.header.scrolled .nav-link.active { color: var(--blue); }
+.header.scrolled .nav-link.active,
+.page-static .header .nav-link:hover,
+.page-static .header .nav-link.active { color: var(--blue); }
 
 .nav-link.nav-cta {
   background: var(--red);
@@ -267,11 +271,13 @@ button { cursor: pointer; border: none; background: none; }
   background: rgba(255,255,255,.15);
   border-color: rgba(255,255,255,.9);
 }
-.header.scrolled .nav-link.lang-switch {
+.header.scrolled .nav-link.lang-switch,
+.page-static .header .nav-link.lang-switch {
   border-color: var(--blue);
   color: var(--blue) !important;
 }
-.header.scrolled .nav-link.lang-switch:hover {
+.header.scrolled .nav-link.lang-switch:hover,
+.page-static .header .nav-link.lang-switch:hover {
   background: var(--blue);
   color: var(--white) !important;
 }
@@ -294,7 +300,8 @@ button { cursor: pointer; border: none; background: none; }
   transition: var(--transition);
 }
 
-.header.scrolled .hamburger span { background: var(--blue); }
+.header.scrolled .hamburger span,
+.page-static .header .hamburger span { background: var(--blue); }
 
 .hamburger.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
 .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
