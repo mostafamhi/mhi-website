@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MHI Analytics Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    :root {
+      --bg:       #0f172a;
+      --card:     #1e293b;
+      --border:   #334155;
+      --text:     #f1f5f9;
+      --muted:    #94a3b8;
+      --red:      #C84C47;
+      --blue:     #3b82f6;
+      --green:    #22c55e;
+      --amber:    #f59e0b;
+      --purple:   #a855f7;
+      --cyan:     #06b6d4;
+      --radius:   12px;
+      --shadow:   0 4px 24px rgba(0,0,0,.5);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    a { color: var(--red); }
+
+    /* ── Screens ── */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: block; }
+
+    /* ── Shared card ── */
+    .center-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .auth-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── Setup ── */
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .brand-icon {
+      width: 48px; height: 48px;
+      background: var(--red);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: #fff; flex-shrink: 0;
+    }
+    .brand-name { font-weight: 700; font-size: 1.1rem; }
+    .brand-sub  { color: var(--muted); font-size: .85rem; }
+    .auth-card h1 { font-size: 1.4rem; margin-bottom: 8px; }
+    .auth-card > p { color: var(--muted); margin-bottom: 28px; line-height: 1.65; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block;
+      font-size: .8rem; font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 7px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-group input:focus { border-color: var(--red); }
+    .help { font-size: .78rem; color: var(--muted); margin-top: 5px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 22px;
+      border: none; border-radius: 9px;
+      font-size: .95rem; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-primary { background: var(--red); color: #fff; width: 100%; justify-content: center; }
+    .btn-primary:hover { background: #b83e3a; }
+    .btn-google {
+      background: #fff; color: #1f1f1f;
+      border: 1px solid #e0e0e0;
+      width: 100%; justify-content: center;
+      font-size: 1rem; padding: 12px 22px;
+    }
+    .btn-google:hover { background: #f5f5f5; }
+    .btn-google img { width: 20px; height: 20px; }
+
+    .error-box {
+      background: rgba(200,76,71,.12);
+      border: 1px solid rgba(200,76,71,.35);
+      border-radius: 9px;
+      padding: 12px 14px;
+      color: #fca5a5;
+      margin-bottom: 18px;
+      display: none;
+      font-size: .9rem;
+    }
+
+    details { margin-top: 22px; }
+    details summary {
+      cursor: pointer;
+      font-size: .82rem;
+      color: var(--muted);
+      user-select: none;
+    }
+    details ol {
+      margin: 12px 0 0 20px;
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.9;
+    }
+
+    /* ── Sign-in screen ── */
+    .signin-icon {
+      width: 72px; height: 72px;
+      background: rgba(200,76,71,.1);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 28px; color: var(--red);
+    }
+    .auth-card.center { text-align: center; max-width: 400px; }
+    .reset-link {
+      display: block; margin-top: 16px;
+      color: var(--muted); font-size: .85rem;
+      cursor: pointer; text-decoration: underline;
+    }
+
+    /* ── Dashboard ── */
+    #screen-dash { display: none; }
+    #screen-dash.active { display: block; }
+
+    .dash-header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .dash-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 1.05rem;
+    }
+    .dash-logo-icon {
+      width: 36px; height: 36px;
+      background: var(--red); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #fff;
+    }
+    .dash-logo em { color: var(--muted); font-style: normal; font-weight: 400; margin-left: 2px; }
+
+    .header-right { display: flex; align-items: center; gap: 10px; }
+
+    .date-btns {
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+    }
+    .date-btn {
+      padding: 6px 14px;
+      border: none; background: transparent;
+      color: var(--muted); font-size: .82rem;
+      cursor: pointer; transition: all .15s;
+      font-weight: 600;
+    }
+    .date-btn.active { background: var(--red); color: #fff; }
+    .date-btn:hover:not(.active) { color: var(--text); }
+
+    .btn-signout {
+      padding: 6px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted); font-size: .82rem;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-signout:hover { border-color: var(--red); color: var(--red); }
+
+    /* Main */
+    .dash-main { padding: 24px; max-width: 1400px; margin: 0 auto; }
+
+    .dash-title { margin-bottom: 22px; }
+    .dash-title h2 { font-size: 1.25rem; margin-bottom: 3px; }
+    .dash-title p  { color: var(--muted); font-size: .88rem; }
+
+    /* Metric cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .metric-label {
+      font-size: .75rem; font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .metric-value {
+      font-size: 1.75rem; font-weight: 700;
+      line-height: 1; margin-bottom: 5px;
+      transition: opacity .3s;
+    }
+    .metric-sub { font-size: .78rem; color: var(--muted); }
+
+    /* Charts */
+    .chart-row  { display: grid; gap: 14px; margin-bottom: 14px; }
+    .chart-row-2 { grid-template-columns: 1fr 1fr; }
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .chart-card h3 {
+      font-size: .9rem; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .chart-card h3 i { color: var(--red); }
+    .chart-wrap { position: relative; }
+
+    /* Loading */
+    .loading {
+      display: flex; align-items: center; justify-content: center;
+      height: 200px; flex-direction: column; gap: 12px;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Table */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th, .data-table td {
+      padding: 9px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: .88rem;
+    }
+    .data-table th {
+      color: var(--muted); font-size: .75rem;
+      text-transform: uppercase; letter-spacing: .5px;
+      font-weight: 600;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .bar-cell { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .bar-cell .bar { height: 5px; background: var(--red); border-radius: 3px; opacity: .65; flex-shrink: 0; }
+
+    /* Footer */
+    .dash-footer {
+      text-align: center; padding: 20px 24px;
+      color: var(--muted); font-size: .78rem;
+      border-top: 1px solid var(--border); margin-top: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .chart-row-2 { grid-template-columns: 1fr; }
+      .dash-main { padding: 14px; }
+      .date-btns { display: none; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .auth-card { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     SETUP SCREEN
+══════════════════════════════════════ -->
+<div id="screen-setup" class="screen">
+  <div class="center-wrap">
+    <div class="auth-card">
+      <div class="brand-row">
+        <div class="brand-icon"><i class="fas fa-fire-flame-curved"></i></div>
+        <div>
+          <div class="brand-name">MHI Analytics</div>
+          <div class="brand-sub">First-time setup</div>
+        </div>
+      </div>
+      <h1>Connect Google Analytics</h1>
+      <p>Enter your credentials once — they're saved in your browser only and never sent anywhere.</p>
+
+      <div id="setup-error" class="error-box"></div>
+
+      <div class="form-group">
+        <label><i class="fas fa-key"></i> &nbsp;OAuth 2.0 Client ID</label>
+        <input type="text" id="inp-client" placeholder="xxxxxxxx.apps.googleusercontent.com" autocomplete="off" />
+        <div class="help">Google Cloud Console → APIs &amp; Services → Credentials</div>
+      </div>
+      <div class="form-group">
+        <label><i class="fab fa-google"></i> &nbsp;GA4 Property ID</label>
+        <input type="text" id="inp-prop" placeholder="123456789" autocomplete="off" />
+        <div class="help">Google Analytics → Admin → Property Settings (numeric ID, not the G-… tag)</div>
+      </div>
+      <button class="btn btn-primary" onclick="saveSetup()">
+        <i class="fas fa-arrow-right"></i> Continue
+      </button>
+
+      <details>
+        <summary>How to get these values — step by step</summary>
+        <ol>
+          <li>Go to <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> and create or select a project.</li>
+          <li>Enable the <strong>Google Analytics Data API</strong> (APIs &amp; Services → Library).</li>
+          <li>Go to <strong>Credentials → Create credentials → OAuth client ID</strong>.</li>
+          <li>Application type: <strong>Web application</strong>.</li>
+          <li>Under "Authorised JavaScript origins" add this page's full URL (e.g. <code>https://erp.mhisystem.com</code>).</li>
+          <li>Copy the generated Client ID and paste it above.</li>
+          <li>For the Property ID: <a href="https://analytics.google.com" target="_blank">analytics.google.com</a> → Admin → Property Settings → look for the number under "Property ID".</li>
+        </ol>
+      </details>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SIGN-IN SCREEN
+══════════════════════════════════════ -->
+<div id="screen-signin" class="screen">
+  <div class="center-wrap">
+    <div class="auth-card center">
+      <div class="signin-icon"><i class="fas fa-chart-line"></i></div>
+      <h1 style="font-size:1.35rem; margin-bottom:8px;">MHI Analytics Dashboard</h1>
+      <p>Sign in with the Google account that owns your Analytics property.</p>
+      <button class="btn btn-google" onclick="signIn()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" />
+        Sign in with Google
+      </button>
+      <span class="reset-link" onclick="resetSetup()">Change configuration</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     DASHBOARD
+══════════════════════════════════════ -->
+<div id="screen-dash" class="screen">
+
+  <header class="dash-header">
+    <div class="dash-logo">
+      <div class="dash-logo-icon"><i class="fas fa-fire-flame-curved"></i></div>
+      MHI <em>Analytics</em>
+    </div>
+    <div class="header-right">
+      <div class="date-btns">
+        <button class="date-btn active" onclick="setRange(7,this)">7D</button>
+        <button class="date-btn"        onclick="setRange(30,this)">30D</button>
+        <button class="date-btn"        onclick="setRange(90,this)">90D</button>
+        <button class="date-btn"        onclick="setRange(365,this)">1Y</button>
+      </div>
+      <button class="btn-signout" onclick="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </header>
+
+  <div class="dash-main">
+
+    <div class="dash-title">
+      <h2>Website Analytics — mhisystem.com</h2>
+      <p id="last-updated">Loading…</p>
+    </div>
+
+    <!-- Overview metrics -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label"><i class="fas fa-users" style="color:var(--blue)"></i> Users</div>
+        <div class="metric-value" id="m-users">—</div>
+        <div class="metric-sub">Active users</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label"><i class="fas fa-mouse-pointer" style="color:var(--green)"></i> Sessions</div>
+        <div class="metric-value" id="m-sessions">—</div>
+        <div class="metric-sub">Total sessions</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label"><i class="fas fa-clock" style="color:var(--amber)"></i> Avg Duration</div>
+        <div class="metric-value" id="m-duration">—</div>
+        <div class="metric-sub">Per session</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label"><i class="fas fa-file-alt" style="color:var(--purple)"></i> Page Views</div>
+        <div class="metric-value" id="m-pageviews">—</div>
+        <div class="metric-sub">Total views</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label"><i class="fas fa-user-plus" style="color:var(--cyan)"></i> New Users</div>
+        <div class="metric-value" id="m-newusers">—</div>
+        <div class="metric-sub">First-time visitors</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label"><i class="fas fa-door-open" style="color:var(--red)"></i> Bounce Rate</div>
+        <div class="metric-value" id="m-bounce">—</div>
+        <div class="metric-sub">Single-page sessions</div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="chart-row" style="margin-bottom:14px;">
+      <div class="chart-card">
+        <h3><i class="fas fa-chart-line"></i> Users &amp; Sessions Over Time</h3>
+        <div class="chart-wrap" style="height:260px;">
+          <canvas id="chart-timeline"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Countries + Devices -->
+    <div class="chart-row chart-row-2">
+      <div class="chart-card">
+        <h3><i class="fas fa-globe"></i> Top Countries</h3>
+        <div id="countries-wrap">
+          <div class="loading"><div class="spinner"></div><span>Loading…</span></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3><i class="fas fa-mobile-alt"></i> Device Types</h3>
+        <div class="chart-wrap" style="height:230px;">
+          <canvas id="chart-devices"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Pages + Channels -->
+    <div class="chart-row chart-row-2" style="margin-top:14px;">
+      <div class="chart-card">
+        <h3><i class="fas fa-file-alt"></i> Top Pages</h3>
+        <div id="pages-wrap">
+          <div class="loading"><div class="spinner"></div><span>Loading…</span></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3><i class="fas fa-traffic-light"></i> Traffic Channels</h3>
+        <div class="chart-wrap" style="height:230px;">
+          <canvas id="chart-channels"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dash-main -->
+
+  <div class="dash-footer">
+    MHI Trading &amp; Contracting Group &nbsp;·&nbsp; Powered by Google Analytics 4
+  </div>
+</div><!-- /screen-dash -->
+
+
+<script>
+// ── State ────────────────────────────────────────────────────
+let clientId   = localStorage.getItem('mhi_ga4_client')   || '';
+let propertyId = localStorage.getItem('mhi_ga4_property') || '';
+let token      = null;
+let tokenExp   = 0;
+let days       = 30;
+let tokenClient;
+const charts   = {};
+const GA4      = 'https://analyticsdata.googleapis.com/v1beta';
+
+// ── Bootstrap ────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  if (!clientId || !propertyId) {
+    show('screen-setup');
+  } else {
+    show('screen-signin');
+    tryInitGIS();
+  }
+});
+window.onGoogleLibraryLoad = () => { if (clientId) tryInitGIS(); };
+
+// ── Screens ──────────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── Setup ────────────────────────────────────────────────────
+function saveSetup() {
+  const cid = document.getElementById('inp-client').value.trim();
+  const pid = document.getElementById('inp-prop').value.trim();
+  const err = document.getElementById('setup-error');
+  err.style.display = 'none';
+
+  if (!cid || !pid) { return showErr(err, 'Please fill in both fields.'); }
+  if (!cid.includes('.apps.googleusercontent.com'))
+    return showErr(err, 'Client ID should end with .apps.googleusercontent.com');
+  if (!/^\d+$/.test(pid))
+    return showErr(err, 'Property ID must be numeric (e.g. 123456789) — not the G-… tag.');
+
+  localStorage.setItem('mhi_ga4_client',   cid);
+  localStorage.setItem('mhi_ga4_property', pid);
+  clientId = cid; propertyId = pid;
+  show('screen-signin');
+  tryInitGIS();
+}
+
+function resetSetup() {
+  localStorage.removeItem('mhi_ga4_client');
+  localStorage.removeItem('mhi_ga4_property');
+  clientId = ''; propertyId = '';
+  show('screen-setup');
+}
+
+function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+
+// ── Google Identity Services ──────────────────────────────────
+function tryInitGIS() {
+  if (!window.google?.accounts?.oauth2) { setTimeout(tryInitGIS, 400); return; }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: clientId,
+    scope: 'https://www.googleapis.com/auth/analytics.readonly',
+    callback: (resp) => {
+      if (resp.error) { alert('Google auth error: ' + resp.error); return; }
+      token    = resp.access_token;
+      tokenExp = Date.now() + (resp.expires_in - 60) * 1000;
+      show('screen-dash');
+      loadAll();
+    }
+  });
+}
+
+function signIn() {
+  if (!tokenClient) { tryInitGIS(); setTimeout(signIn, 500); return; }
+  tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+function signOut() {
+  if (token) google.accounts.oauth2.revoke(token);
+  token = null;
+  show('screen-signin');
+}
+
+// ── Date range ────────────────────────────────────────────────
+function setRange(d, btn) {
+  days = d;
+  document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadAll();
+}
+
+// ── GA4 API ───────────────────────────────────────────────────
+async function api(body) {
+  if (Date.now() > tokenExp) {
+    tokenClient.requestAccessToken({ prompt: '' });
+    return null;
+  }
+  const r = await fetch(`${GA4}/properties/${propertyId}:runReport`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    throw new Error(e.error?.message || `HTTP ${r.status}`);
+  }
+  return r.json();
+}
+
+// ── Load all ──────────────────────────────────────────────────
+async function loadAll() {
+  const s = `${days}daysAgo`, e = 'today';
+  document.getElementById('last-updated').textContent = 'Loading data…';
+  ['m-users','m-sessions','m-duration','m-pageviews','m-newusers','m-bounce']
+    .forEach(id => { document.getElementById(id).textContent = '—'; });
+
+  try {
+    await Promise.all([
+      loadOverview(s, e),
+      loadTimeline(s, e),
+      loadCountries(s, e),
+      loadDevices(s, e),
+      loadPages(s, e),
+      loadChannels(s, e)
+    ]);
+    document.getElementById('last-updated').textContent =
+      'Updated ' + new Date().toLocaleTimeString();
+  } catch (err) {
+    document.getElementById('last-updated').textContent = 'Error: ' + err.message;
+    console.error(err);
+  }
+}
+
+// ── Individual loaders ────────────────────────────────────────
+async function loadOverview(s, e) {
+  const d = await api({
+    dateRanges: [{startDate: s, endDate: e}],
+    metrics: [
+      {name:'activeUsers'},{name:'sessions'},{name:'averageSessionDuration'},
+      {name:'screenPageViews'},{name:'newUsers'},{name:'bounceRate'}
+    ]
+  });
+  if (!d) return;
+  const v = i => d.rows?.[0]?.metricValues[i]?.value || '0';
+  set('m-users',    fmtN(v(0)));
+  set('m-sessions', fmtN(v(1)));
+  set('m-duration', fmtDur(v(2)));
+  set('m-pageviews',fmtN(v(3)));
+  set('m-newusers', fmtN(v(4)));
+  set('m-bounce',   fmtPct(v(5)));
+}
+
+async function loadTimeline(s, e) {
+  const d = await api({
+    dateRanges: [{startDate: s, endDate: e}],
+    dimensions: [{name:'date'}],
+    metrics: [{name:'activeUsers'},{name:'sessions'}],
+    orderBys: [{dimension:{dimensionName:'date'}}]
+  });
+  if (!d) return;
+  const rows = d.rows || [];
+  const labels  = rows.map(r => { const v=r.dimensionValues[0].value; return `${v.slice(4,6)}/${v.slice(6,8)}`; });
+  const users   = rows.map(r => +r.metricValues[0].value);
+  const sessions= rows.map(r => +r.metricValues[1].value);
+  lineChart('chart-timeline', labels, [
+    {label:'Users',   data:users,    borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.12)'},
+    {label:'Sessions',data:sessions, borderColor:'#C84C47', backgroundColor:'rgba(200,76,71,.12)'}
+  ]);
+}
+
+async function loadCountries(s, e) {
+  const d = await api({
+    dateRanges: [{startDate: s, endDate: e}],
+    dimensions: [{name:'country'}],
+    metrics: [{name:'activeUsers'},{name:'sessions'}],
+    orderBys: [{metric:{metricName:'activeUsers'},desc:true}],
+    limit: 10
+  });
+  if (!d) return;
+  const rows = d.rows || [];
+  const max  = rows[0] ? +rows[0].metricValues[0].value : 1;
+  const tbody = rows.map(r => {
+    const country = r.dimensionValues[0].value;
+    const users   = +r.metricValues[0].value;
+    const sess    = +r.metricValues[1].value;
+    const w       = Math.round(users / max * 90);
+    return `<tr>
+      <td>${flag(country)} ${country}</td>
+      <td><div class="bar-cell"><div class="bar" style="width:${w}px"></div>${fmtN(users)}</div></td>
+      <td>${fmtN(sess)}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('countries-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Country</th><th>Users</th><th>Sessions</th></tr></thead>
+      <tbody>${tbody || '<tr><td colspan="3" style="color:var(--muted);padding:20px 10px">No data yet</td></tr>'}</tbody>
+    </table>`;
+}
+
+async function loadDevices(s, e) {
+  const d = await api({
+    dateRanges: [{startDate: s, endDate: e}],
+    dimensions: [{name:'deviceCategory'}],
+    metrics: [{name:'sessions'}],
+    orderBys: [{metric:{metricName:'sessions'},desc:true}]
+  });
+  if (!d) return;
+  const rows = d.rows || [];
+  doughnut('chart-devices',
+    rows.map(r => cap(r.dimensionValues[0].value)),
+    rows.map(r => +r.metricValues[0].value),
+    ['#C84C47','#3b82f6','#22c55e','#f59e0b']
+  );
+}
+
+async function loadPages(s, e) {
+  const d = await api({
+    dateRanges: [{startDate: s, endDate: e}],
+    dimensions: [{name:'pagePath'}],
+    metrics: [{name:'screenPageViews'},{name:'averageSessionDuration'}],
+    orderBys: [{metric:{metricName:'screenPageViews'},desc:true}],
+    limit: 10
+  });
+  if (!d) return;
+  const rows = d.rows || [];
+  const max  = rows[0] ? +rows[0].metricValues[0].value : 1;
+  const tbody = rows.map(r => {
+    const page  = r.dimensionValues[0].value;
+    const views = +r.metricValues[0].value;
+    const dur   = fmtDur(r.metricValues[1].value);
+    const w     = Math.round(views / max * 90);
+    const label = page.length > 36 ? page.slice(0,36)+'…' : page;
+    return `<tr>
+      <td title="${page}">${label}</td>
+      <td><div class="bar-cell"><div class="bar" style="width:${w}px"></div>${fmtN(views)}</div></td>
+      <td>${dur}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('pages-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Page</th><th>Views</th><th>Avg Duration</th></tr></thead>
+      <tbody>${tbody || '<tr><td colspan="3" style="color:var(--muted);padding:20px 10px">No data yet</td></tr>'}</tbody>
+    </table>`;
+}
+
+async function loadChannels(s, e) {
+  const d = await api({
+    dateRanges: [{startDate: s, endDate: e}],
+    dimensions: [{name:'sessionDefaultChannelGroup'}],
+    metrics: [{name:'sessions'}],
+    orderBys: [{metric:{metricName:'sessions'},desc:true}]
+  });
+  if (!d) return;
+  const rows = d.rows || [];
+  doughnut('chart-channels',
+    rows.map(r => r.dimensionValues[0].value),
+    rows.map(r => +r.metricValues[0].value),
+    ['#C84C47','#3b82f6','#22c55e','#f59e0b','#a855f7','#06b6d4','#ec4899']
+  );
+}
+
+// ── Chart helpers ─────────────────────────────────────────────
+Chart.defaults.color       = '#94a3b8';
+Chart.defaults.borderColor = '#334155';
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+
+function lineChart(id, labels, datasets) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: datasets.map(ds => ({
+        ...ds, fill: true, tension: 0.4, borderWidth: 2,
+        pointRadius: labels.length > 60 ? 0 : 3,
+        pointHoverRadius: 5
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: {mode:'index', intersect:false},
+      scales: {
+        y: {beginAtZero:true, grid:{color:'rgba(51,65,85,.6)'}},
+        x: {grid:{color:'rgba(51,65,85,.6)'}}
+      },
+      plugins: {legend:{position:'top', labels:{usePointStyle:true, pointStyleWidth:10}}}
+    }
+  });
+}
+
+function doughnut(id, labels, data, colors) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{data, backgroundColor: colors, borderWidth:2, borderColor:'#1e293b', hoverOffset:6}]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {legend:{position:'right', labels:{usePointStyle:true, pointStyleWidth:10, padding:12}}}
+    }
+  });
+}
+
+// ── Formatters ────────────────────────────────────────────────
+function fmtN(n) {
+  n = +n;
+  if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1)+'K';
+  return n.toLocaleString();
+}
+function fmtDur(secs) {
+  secs = Math.round(+secs);
+  const m = Math.floor(secs/60), s = secs%60;
+  return m ? `${m}m ${s}s` : `${s}s`;
+}
+function fmtPct(v) { return (+((+v)*100).toFixed(1))+'%'; }
+function cap(s)    { return s.charAt(0).toUpperCase()+s.slice(1); }
+function set(id,v) { document.getElementById(id).textContent = v; }
+
+function flag(country) {
+  const m = {
+    'Egypt':'🇪🇬','Saudi Arabia':'🇸🇦','United Arab Emirates':'🇦🇪','Kuwait':'🇰🇼',
+    'Qatar':'🇶🇦','Bahrain':'🇧🇭','Oman':'🇴🇲','Jordan':'🇯🇴','Lebanon':'🇱🇧',
+    'Iraq':'🇮🇶','Libya':'🇱🇾','Sudan':'🇸🇩','Morocco':'🇲🇦','Algeria':'🇩🇿',
+    'Tunisia':'🇹🇳','Syria':'🇸🇾','Yemen':'🇾🇪','Palestine':'🇵🇸',
+    'United States':'🇺🇸','United Kingdom':'🇬🇧','Germany':'🇩🇪','France':'🇫🇷',
+    'Turkey':'🇹🇷','India':'🇮🇳','Pakistan':'🇵🇰','(not set)':'🌍'
+  };
+  return m[country] || '🌍';
+}
+</script>
+</body>
+</html>
