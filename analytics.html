@@ -489,8 +489,8 @@
 
 <script>
 // ── State ────────────────────────────────────────────────────
-let clientId   = localStorage.getItem('mhi_ga4_client')   || '';
-let propertyId = localStorage.getItem('mhi_ga4_property') || '';
+let clientId   = localStorage.getItem('mhi_ga4_client')   || '1060297595661-2korqcr556tqe23hquscerc9eg319fdb.apps.googleusercontent.com';
+let propertyId = localStorage.getItem('mhi_ga4_property') || '558056539';
 let token      = null;
 let tokenExp   = 0;
 let days       = 30;
@@ -500,12 +500,8 @@ const GA4      = 'https://analyticsdata.googleapis.com/v1beta';
 
 // ── Bootstrap ────────────────────────────────────────────────
 window.addEventListener('load', () => {
-  if (!clientId || !propertyId) {
-    show('screen-setup');
-  } else {
-    show('screen-signin');
-    tryInitGIS();
-  }
+  show('screen-signin');
+  tryInitGIS();
 });
 window.onGoogleLibraryLoad = () => { if (clientId) tryInitGIS(); };
 
