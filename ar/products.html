@@ -42,6 +42,7 @@
         <li><a href="../ar/index.html#about"      class="nav-link">من نحن</a></li>
         <li><a href="../ar/index.html#fire-alarm" class="nav-link">أنظمة الإنذار من الحريق</a></li>
         <li><a href="#products"                   class="nav-link active">المنتجات</a></li>
+        <li><a href="#catalogue" class="nav-link" data-catalog-open>الكتالوج</a></li>
         <li><a href="../ar/index.html#services"   class="nav-link">خدماتنا</a></li>
         <li><a href="../ar/index.html#projects"   class="nav-link">المشاريع</a></li>
         <li><a href="../ar/index.html#contact"    class="nav-link nav-cta">اتصل بنا</a></li>
@@ -69,6 +70,7 @@
         </div>
 
         <div class="prod-cat-tabs">
+          <button type="button" class="catalog-tab-btn" data-catalog-open><i class="fas fa-file-pdf"></i> تحميل الكتالوج الكامل</button>
           <button class="prod-cat-btn active" data-tab="addressable">الأنظمة العنوانية</button>
           <button class="prod-cat-btn" data-tab="conventional">الأنظمة التقليدية</button>
           <button class="prod-cat-btn" data-tab="gas">إخماد الغاز</button>
@@ -284,6 +286,40 @@
       </div>
     </div>
   </footer>
+
+  <!-- تحميل الكتالوج (بعد إدخال البريد الإلكتروني) -->
+  <div class="catalog-modal" id="catalogModal" role="dialog" aria-modal="true" aria-labelledby="catalogTitle" aria-hidden="true">
+    <div class="catalog-box">
+      <button type="button" class="catalog-close" aria-label="إغلاق">&times;</button>
+
+      <div class="catalog-step" id="catalogStepForm">
+        <h3 id="catalogTitle">تحميل كتالوج منتجات زيتا</h3>
+        <p>أدخل بريدك الإلكتروني ثم اختر اللغة لتحميل الكتالوج الكامل.</p>
+        <form id="catalogForm" novalidate data-error-msg="عذراً، حدث خطأ ما. يرجى المحاولة مرة أخرى أو مراسلتنا على info@mhisystem.com">
+          <input type="hidden" name="access_key" value="a216b57f-4d25-4ff0-a7a1-caee9b956564" />
+          <input type="hidden" name="subject" value="Catalogue Download — MHI Website (Arabic)" />
+          <input type="hidden" name="from_name" value="MHI Website" />
+          <input type="hidden" name="redirect" value="false" />
+          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" />
+          <div class="form-group">
+            <label for="catalogEmail">البريد الإلكتروني <span class="req">*</span></label>
+            <input type="email" id="catalogEmail" name="email" placeholder="your@email.com" autocomplete="email" dir="ltr" required />
+          </div>
+          <div class="catalog-error" id="catalogError">يرجى إدخال بريد إلكتروني صحيح.</div>
+          <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-unlock"></i> احصل على الكتالوج</button>
+        </form>
+      </div>
+
+      <div class="catalog-step" id="catalogStepDownload" hidden>
+        <h3>شكراً لك!</h3>
+        <p>اختر اللغة لتحميل الكتالوج.</p>
+        <div class="catalog-downloads">
+          <a class="btn btn-primary" href="../catalog/Zeta-Product-Catalogue-Arabic.pdf" download><i class="fas fa-download"></i> الكتالوج بالعربية</a>
+          <a class="btn btn-primary" href="../catalog/Zeta-Product-Catalogue-English.pdf" download><i class="fas fa-download"></i> English Catalogue</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Back to Top -->
   <button class="back-to-top" id="backToTop" aria-label="Back to top">

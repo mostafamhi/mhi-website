@@ -42,6 +42,7 @@
         <li><a href="#about" class="nav-link">About Us</a></li>
         <li><a href="#fire-alarm" class="nav-link">Fire Alarm Systems</a></li>
         <li><a href="products.html" class="nav-link">Products</a></li>
+        <li><a href="#catalogue" class="nav-link" data-catalog-open>Catalogue</a></li>
         <li><a href="#services" class="nav-link">Our Services</a></li>
         <li><a href="#projects" class="nav-link">Projects</a></li>
         <li><a href="#contact" class="nav-link nav-cta">Contact Us</a></li>
@@ -969,6 +970,40 @@
       </div>
     </div>
   </footer>
+
+  <!-- Catalogue download (email-gated) -->
+  <div class="catalog-modal" id="catalogModal" role="dialog" aria-modal="true" aria-labelledby="catalogTitle" aria-hidden="true">
+    <div class="catalog-box">
+      <button type="button" class="catalog-close" aria-label="Close">&times;</button>
+
+      <div class="catalog-step" id="catalogStepForm">
+        <h3 id="catalogTitle">Download the Zeta Product Catalogue</h3>
+        <p>Enter your email address and choose your language to get the full catalogue.</p>
+        <form id="catalogForm" novalidate data-error-msg="Sorry, something went wrong. Please try again or email us at info@mhisystem.com">
+          <input type="hidden" name="access_key" value="a216b57f-4d25-4ff0-a7a1-caee9b956564" />
+          <input type="hidden" name="subject" value="Catalogue Download — MHI Website" />
+          <input type="hidden" name="from_name" value="MHI Website" />
+          <input type="hidden" name="redirect" value="false" />
+          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" />
+          <div class="form-group">
+            <label for="catalogEmail">Email Address <span class="req">*</span></label>
+            <input type="email" id="catalogEmail" name="email" placeholder="your@email.com" autocomplete="email" required />
+          </div>
+          <div class="catalog-error" id="catalogError">Please enter a valid email address.</div>
+          <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-unlock"></i> Get the Catalogue</button>
+        </form>
+      </div>
+
+      <div class="catalog-step" id="catalogStepDownload" hidden>
+        <h3>Thank you!</h3>
+        <p>Choose your language to download the catalogue.</p>
+        <div class="catalog-downloads">
+          <a class="btn btn-primary" href="catalog/Zeta-Product-Catalogue-English.pdf" download><i class="fas fa-download"></i> English Catalogue</a>
+          <a class="btn btn-primary" href="catalog/Zeta-Product-Catalogue-Arabic.pdf" download><i class="fas fa-download"></i> الكتالوج بالعربية</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Back to Top -->
   <button class="back-to-top" id="backToTop" aria-label="Back to top">

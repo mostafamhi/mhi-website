@@ -261,3 +261,74 @@ if (contactForm) {
     }
   });
 }
+
+/* -------------------------------------------------------
+   Catalogue download — email gate (Web3Forms)
+------------------------------------------------------- */
+(function () {
+  const modal = document.getElementById('catalogModal');
+  if (!modal) return;
+
+  const openers  = document.querySelectorAll('[data-catalog-open]');
+  const form     = document.getElementById('catalogForm');
+  const stepForm = document.getElementById('catalogStepForm');
+  const stepDl   = document.getElementById('catalogStepDownload');
+  const emailEl  = document.getElementById('catalogEmail');
+  const errorEl  = document.getElementById('catalogError');
+  const submit   = form.querySelector('button[type="submit"]');
+  let lastFocus  = null;
+
+  const open = () => {
+    lastFocus = document.activeElement;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => { if (!stepForm.hidden) emailEl.focus(); }, 50);
+  };
+  const close = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (lastFocus) lastFocus.focus();
+  };
+
+  openers.forEach(b => b.addEventListener('click', e => { e.preventDefault(); open(); }));
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+  modal.querySelector('.catalog-close').addEventListener('click', close);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) close();
+  });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    errorEl.style.display = 'none';
+
+    if (form.querySelector('[name="botcheck"]').checked) return;
+
+    const email = emailEl.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      errorEl.style.display = 'block';
+      emailEl.focus();
+      return;
+    }
+
+    const label = submit.innerHTML;
+    submit.disabled = true;
+    submit.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!res.ok) throw new Error('Server error');
+      stepForm.hidden = true;
+      stepDl.hidden = false;
+    } catch {
+      submit.disabled = false;
+      submit.innerHTML = label;
+      alert(form.dataset.errorMsg);
+    }
+  });
+})();
