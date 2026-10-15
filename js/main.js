@@ -263,19 +263,21 @@ if (contactForm) {
 }
 
 /* -------------------------------------------------------
-   Catalogue download — email gate (Web3Forms)
+   Catalogue download — language + email, saved to the ERP
 ------------------------------------------------------- */
 (function () {
   const modal = document.getElementById('catalogModal');
   if (!modal) return;
 
+  const CATALOG_API = 'https://erp.mhisystem.com/api/catalog-leads/request';
   const openers  = document.querySelectorAll('[data-catalog-open]');
   const form     = document.getElementById('catalogForm');
   const stepForm = document.getElementById('catalogStepForm');
-  const stepDl   = document.getElementById('catalogStepDownload');
+  const stepDone = document.getElementById('catalogStepDownload');
   const emailEl  = document.getElementById('catalogEmail');
   const errorEl  = document.getElementById('catalogError');
-  const submit   = form.querySelector('button[type="submit"]');
+  const retryEl  = document.getElementById('catalogRetry');
+  const submit   = form.querySelector('.catalog-submit');
   let lastFocus  = null;
 
   const open = () => {
@@ -295,15 +297,49 @@ if (contactForm) {
   openers.forEach(b => b.addEventListener('click', e => { e.preventDefault(); open(); }));
   modal.addEventListener('click', e => { if (e.target === modal) close(); });
   modal.querySelector('.catalog-close').addEventListener('click', close);
+  modal.querySelector('.catalog-finish').addEventListener('click', close);
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && modal.classList.contains('open')) close();
   });
+
+  const startDownload = href => {
+    const a = document.createElement('a');
+    a.href = href;
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  async function saveRequest(payload) {
+    try {
+      const res = await fetch(CATALOG_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) return true;
+      if (res.status === 400) return false;
+    } catch { /* fall through to the email backup */ }
+
+    // ERP unreachable — still get the lead by email so nothing is lost.
+    try {
+      const fd = new FormData(form);
+      fd.set('message', 'Catalogue (' + payload.language + ') requested by ' + payload.email);
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST', body: fd, headers: { 'Accept': 'application/json' }
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
     errorEl.style.display = 'none';
 
-    if (form.querySelector('[name="botcheck"]').checked) return;
+    if (form.elements.website.value.trim() !== '') return;
 
     const email = emailEl.value.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
@@ -312,23 +348,30 @@ if (contactForm) {
       return;
     }
 
+    const chosen = form.querySelector('input[name="language"]:checked');
     const label = submit.innerHTML;
     submit.disabled = true;
     submit.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-    try {
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { 'Accept': 'application/json' }
-      });
-      if (!res.ok) throw new Error('Server error');
-      stepForm.hidden = true;
-      stepDl.hidden = false;
-    } catch {
+    const ok = await saveRequest({
+      email,
+      language: chosen.value,
+      source_page: location.pathname,
+      site_language: form.dataset.siteLang,
+      website: ''
+    });
+
+    if (!ok) {
       submit.disabled = false;
       submit.innerHTML = label;
       alert(form.dataset.errorMsg);
+      return;
     }
+
+    const file = new URL(chosen.dataset.file, location.href).href;
+    retryEl.href = file;
+    stepForm.hidden = true;
+    stepDone.hidden = false;
+    startDownload(file);
   });
 })();

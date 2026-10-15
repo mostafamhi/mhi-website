@@ -286,36 +286,58 @@
     </div>
   </footer>
 
-  <!-- Catalogue download (email-gated) -->
+  <!-- Catalogue download popup -->
   <div class="catalog-modal" id="catalogModal" role="dialog" aria-modal="true" aria-labelledby="catalogTitle" aria-hidden="true">
     <div class="catalog-box">
       <button type="button" class="catalog-close" aria-label="Close">&times;</button>
 
-      <div class="catalog-step" id="catalogStepForm">
-        <h3 id="catalogTitle">Download the Zeta Product Catalogue</h3>
-        <p>Enter your email address and choose your language to get the full catalogue.</p>
-        <form id="catalogForm" novalidate data-error-msg="Sorry, something went wrong. Please try again or email us at info@mhisystem.com">
+      <div class="catalog-head">
+        <div class="catalog-icon"><i class="fas fa-file-pdf"></i></div>
+        <h3 id="catalogTitle">Zeta Product Catalogue</h3>
+        <p>The complete range of fire alarm systems, detectors and accessories</p>
+      </div>
+
+      <div class="catalog-body" id="catalogStepForm">
+        <form id="catalogForm" novalidate data-error-msg="Sorry, something went wrong. Please try again or email us at info@mhisystem.com" data-site-lang="en">
           <input type="hidden" name="access_key" value="a216b57f-4d25-4ff0-a7a1-caee9b956564" />
           <input type="hidden" name="subject" value="Catalogue Download — MHI Website" />
           <input type="hidden" name="from_name" value="MHI Website" />
           <input type="hidden" name="redirect" value="false" />
-          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" />
-          <div class="form-group">
-            <label for="catalogEmail">Email Address <span class="req">*</span></label>
-            <input type="email" id="catalogEmail" name="email" placeholder="your@email.com" autocomplete="email" required />
+          <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <div class="catalog-label">Choose catalogue language</div>
+          <div class="catalog-langs">
+            <label class="catalog-lang">
+              <input type="radio" name="language" value="en" data-file="catalog/Zeta-Product-Catalogue-English.pdf" checked />
+              <span class="catalog-lang-card">
+                <span class="catalog-lang-name">English</span>
+                <span class="catalog-lang-sub">PDF · 23 MB</span>
+              </span>
+            </label>
+            <label class="catalog-lang">
+              <input type="radio" name="language" value="ar" data-file="catalog/Zeta-Product-Catalogue-Arabic.pdf" />
+              <span class="catalog-lang-card">
+                <span class="catalog-lang-name">العربية</span>
+                <span class="catalog-lang-sub">PDF · 24 MB</span>
+              </span>
+            </label>
           </div>
+
+          <label class="catalog-label" for="catalogEmail">Email address</label>
+          <input type="email" id="catalogEmail" name="email" class="catalog-input" placeholder="name@company.com" autocomplete="email" required />
           <div class="catalog-error" id="catalogError">Please enter a valid email address.</div>
-          <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-unlock"></i> Get the Catalogue</button>
+
+          <button type="submit" class="catalog-submit"><i class="fas fa-download"></i> <span>Download Catalogue</span></button>
+          <p class="catalog-privacy"><i class="fas fa-lock"></i> We respect your privacy and will not share your email.</p>
         </form>
       </div>
 
-      <div class="catalog-step" id="catalogStepDownload" hidden>
-        <h3>Thank you!</h3>
-        <p>Choose your language to download the catalogue.</p>
-        <div class="catalog-downloads">
-          <a class="btn btn-primary" href="catalog/Zeta-Product-Catalogue-English.pdf" download><i class="fas fa-download"></i> English Catalogue</a>
-          <a class="btn btn-primary" href="catalog/Zeta-Product-Catalogue-Arabic.pdf" download><i class="fas fa-download"></i> الكتالوج بالعربية</a>
-        </div>
+      <div class="catalog-body catalog-done" id="catalogStepDownload" hidden>
+        <div class="catalog-check"><i class="fas fa-check"></i></div>
+        <h4>Thank you!</h4>
+        <p>Your catalogue download has started.</p>
+        <a class="catalog-retry" id="catalogRetry" href="#" download>Didn't start? Click here</a>
+        <button type="button" class="catalog-submit catalog-finish">Close</button>
       </div>
     </div>
   </div>
